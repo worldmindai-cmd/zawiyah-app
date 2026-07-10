@@ -1,0 +1,17 @@
+{
+  "@@locale": "ar",
+  "appTitle": "زاوية",
+  "appSubtitle": "مكان للتعلّم والعبادة والرفقة من خلال القرآن الكريم وتعاليم أهل البيت عليهم السلام",
+  "navMorningAamal": "أعمال الصباح",
+  "navTasbeeh": "التسبيح",
+  "navKahani": "القصص",
+  "navMore": "المزيد / المساعدة",
+  "resetCounters": "إعادة تعيين العدادات",
+  "openAll": "فتح الكل",
+  "closeAll": "إغلاق الكل",
+  "todayLabel": "اليوم",
+  "islamicDateLabel": "التاريخ الهجري",
+  "shiaCalendarLabel": "التقويم الشيعي",
+  "tap": "اضغط",
+  "reset": "إعادة تعيين"
+}

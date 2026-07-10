@@ -1,0 +1,56 @@
+name: zawiyah
+description: "A place of learning, worship and companionship through the Holy Qur'an and the teachings of the Ahlul Bayt (AS)."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Localization -- required for the en/ur/ar (RTL-aware) scope decided
+  # for v1.0, with fa/fr planned as later additions.
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
+  # Offline-first local storage. sqflite for structured data (Collections,
+  # progress, downloaded-content manifest); flutter_secure_storage for
+  # anything sensitive (per the encryption-scope decision: only user data,
+  # never the public sacred texts themselves).
+  sqflite: ^2.3.3
+  path_provider: ^2.1.3
+  path: ^1.9.1
+  flutter_secure_storage: ^9.2.2
+
+  # State management -- Riverpod chosen for testability and clean
+  # separation between the Application Layer and Presentation Layer
+  # described in the architecture.
+  flutter_riverpod: ^2.5.1
+
+  # Networking -- for the AI abstraction layer's Claude-backed
+  # implementation, and future on-demand content downloads.
+  http: ^1.2.1
+
+  # Haptics (per the v0.5 counter experience decisions: haptic on every
+  # tap, stronger on completion) use Flutter's built-in
+  # flutter/services.dart HapticFeedback -- no extra package needed.
+
+  # Text-to-speech for Kahani read-aloud -- wraps each platform's
+  # system TTS engine (AVSpeechSynthesizer/TextToSpeech), matching the
+  # "use the system voice, never bundle audio assets" decision already
+  # established for MotoMind's v2.0 voice guidance.
+  flutter_tts: ^4.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true # Enables flutter_localizations codegen from .arb files
+  assets:
+    - assets/content/kahani/

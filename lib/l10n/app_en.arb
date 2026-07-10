@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "appTitle": "Zawiyah",
+  "appSubtitle": "A place of learning, worship and companionship through the Holy Qur'an and the teachings of the Ahlul Bayt (AS)",
+  "navMorningAamal": "Morning A'māl",
+  "navTasbeeh": "Tasbeeh",
+  "navKahani": "Kahani",
+  "navMore": "More / Help",
+  "resetCounters": "Reset counters",
+  "openAll": "Open all",
+  "closeAll": "Close all",
+  "todayLabel": "Today",
+  "islamicDateLabel": "Islamic date",
+  "shiaCalendarLabel": "Shia calendar",
+  "tap": "Tap",
+  "reset": "Reset"
+}
