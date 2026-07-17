@@ -16,13 +16,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'A place of learning, worship and companionship through the Holy Qur\'an and the teachings of the Ahlul Bayt (AS)';
 
   @override
+  String get navHome => 'Home';
+
+  @override
   String get navMorningAamal => 'Morning A\'māl';
+
+  @override
+  String get navLearn => 'Learn';
 
   @override
   String get navTasbeeh => 'Tasbeeh';
 
   @override
   String get navKahani => 'Kahani';
+
+  @override
+  String get navLibrary => 'Library';
 
   @override
   String get navMore => 'More / Help';

@@ -16,13 +16,22 @@ class AppLocalizationsAr extends AppLocalizations {
       'مكان للتعلّم والعبادة والرفقة من خلال القرآن الكريم وتعاليم أهل البيت عليهم السلام';
 
   @override
+  String get navHome => 'الرئيسية';
+
+  @override
   String get navMorningAamal => 'أعمال الصباح';
+
+  @override
+  String get navLearn => 'تعلم';
 
   @override
   String get navTasbeeh => 'التسبيح';
 
   @override
   String get navKahani => 'القصص';
+
+  @override
+  String get navLibrary => 'المكتبة';
 
   @override
   String get navMore => 'المزيد / المساعدة';

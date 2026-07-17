@@ -22,13 +22,12 @@ flutter test
 7. Complete App Privacy answers. Current v1 stores devotional progress and onboarding role locally and does not contain advertising.
 
 ## Android
-1. Create a Play upload key and `android/key.properties`.
-2. Replace the temporary debug release signing fallback in `android/app/build.gradle.kts` with the upload signing configuration before Play upload.
-3. Build:
+1. Release signing is configured — `android/app/build.gradle.kts` loads `android/key.properties` (gitignored, not committed) and signs with the `zawiyah-upload` key. Both `key.properties` and `android/app/upload-keystore.jks` exist only on the machine that generated them; back them up somewhere durable, since losing them blocks future Play updates.
+2. Build:
 ```bash
 flutter build appbundle --release
 ```
-4. Upload `build/app/outputs/bundle/release/app-release.aab` to Play Console.
+3. Upload `build/app/outputs/bundle/release/app-release.aab` to Play Console.
 
 ## Content review before release
 - Confirm all Arabic, transliteration and English translations.
@@ -37,9 +36,11 @@ flutter build appbundle --release
 - No visual depictions of the Prophet (SAW), Lady Fatima (SA), or the Twelve Imams (AS).
 
 ## Store-review blockers to complete
-- Hosted privacy policy URL.
-- Support/contact URL.
-- Final screenshots for required device sizes.
-- Apple age rating and Google content rating.
-- Release signing credentials.
-- Scholar/content reviewer approval for public religious content.
+- ~~Hosted privacy policy URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/privacy-policy.html
+- ~~Support/contact URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/support.html
+- ~~Final screenshots for required device sizes.~~ `store_assets/screenshots/` — iPhone 17 Pro Max (6.9"), iPad Pro 13", Android phone (Pixel 8 Pro), 5 screens each (Home, Morning A'māl, Kahani, Library, More). Regenerate anytime with `integration_test/screenshot_flow_test.dart` via `flutter drive --driver=test_driver/integration_test.dart --target=integration_test/screenshot_flow_test.dart -d <device>`, capturing on each `SCREENSHOT_READY:<name>` stdout marker. Note: the iPad screenshots show the phone layout simply stretched to full width, not a tailored tablet layout — functional but not polished; worth a proper responsive pass before submission if that matters for the listing.
+- Apple age rating and Google content rating — answer key in `AGE_AND_CONTENT_RATINGS.md`, still needs to actually be entered in App Store Connect / Play Console (only fillable live in each console).
+- ~~Release signing credentials.~~ Generated — see Android section above.
+- Scholar/content reviewer approval for public religious content — see `CONTENT_REVIEW_PACKAGE.md`.
+- ~~App icon.~~ Real icon added — a mihrab (prayer-niche) with a lamp, gold on near-black, matching `zawiyah_colors.dart` and avoiding any figurative depiction per the Constitution. Generated via `flutter_launcher_icons` from `assets/icon/icon.png` (full-bleed, iOS/legacy Android) and `assets/icon/icon_foreground.png` (Android adaptive icon layer). Re-run `dart run flutter_launcher_icons` after editing either source file.
+- ~~Feature graphic (Google Play, 1024×500).~~ `store_assets/feature_graphic.png`.

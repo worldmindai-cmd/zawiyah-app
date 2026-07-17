@@ -38,22 +38,24 @@ class LocalStorageService {
     final path = join(await getDatabasesPath(), 'zawiyah_user_data.db');
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await _createAllTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // v1 -> v2 added key_value_store (for the free/unbounded
-        // Tasbeeh counter). Using CREATE TABLE IF NOT EXISTS here and
-        // in onCreate means this is safe to run even if some tables
-        // already exist, rather than assuming a clean upgrade path --
-        // important during this early rapid-iteration phase where the
-        // schema is still actively growing.
         if (oldVersion < 2) {
           await db.execute('''
             CREATE TABLE IF NOT EXISTS key_value_store (
               key TEXT PRIMARY KEY,
               value INTEGER NOT NULL
+            )
+          ''');
+        }
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS string_kv_store (
+              key TEXT PRIMARY KEY,
+              value TEXT NOT NULL
             )
           ''');
         }
@@ -104,6 +106,18 @@ class LocalStorageService {
           CREATE TABLE IF NOT EXISTS key_value_store (
             key TEXT PRIMARY KEY,
             value INTEGER NOT NULL
+          )
+        ''');
+
+        // Separate string-valued store for settings like selected
+        // role, onboarding completion, notification category toggles
+        // (stored as '1'/'0' strings for simplicity alongside role
+        // name strings) -- kept distinct from key_value_store since
+        // that table's value column is INTEGER-typed.
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS string_kv_store (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
           )
         ''');
   }
@@ -169,6 +183,112 @@ class LocalStorageService {
     await db.insert(
       'key_value_store',
       {'key': 'free_tasbeeh_counter', 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // ── Hijri date manual adjustment ─────────────────────────────
+  // Moon-sighting varies by region/method/marja' -- the calculated
+  // Hijri date won't always match local observance, so users can
+  // nudge it by a day in either direction.
+
+  Future<int> getHijriDayOffset() async {
+    final db = await database;
+    final rows = await db.query('key_value_store',
+        where: 'key = ?', whereArgs: ['hijri_day_offset']);
+    if (rows.isEmpty) return 0;
+    return rows.first['value'] as int;
+  }
+
+  Future<void> setHijriDayOffset(int offset) async {
+    final db = await database;
+    await db.insert(
+      'key_value_store',
+      {'key': 'hijri_day_offset', 'value': offset},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // ── Collections ──────────────────────────────────────────
+
+  Future<void> createCollection(String id, String title) async {
+    final db = await database;
+    await db.insert(
+      'collections',
+      {
+        'id': id,
+        'title': title,
+        'created_at': DateTime.now().toIso8601String(),
+        'is_shared_anonymously': 0,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Map<String, Object?>>> listCollectionRows() async {
+    final db = await database;
+    return db.query('collections', orderBy: 'created_at DESC');
+  }
+
+  Future<List<String>> getCollectionContentIds(String collectionId) async {
+    final db = await database;
+    final rows = await db.query(
+      'collection_items',
+      where: 'collection_id = ?',
+      whereArgs: [collectionId],
+      orderBy: 'sort_order ASC',
+    );
+    return rows.map((r) => r['content_id'] as String).toList();
+  }
+
+  Future<void> addContentToCollection({
+    required String collectionId,
+    required String contentId,
+  }) async {
+    final db = await database;
+    final existing = await getCollectionContentIds(collectionId);
+    if (existing.contains(contentId)) return; // avoid duplicates
+    await db.insert('collection_items', {
+      'collection_id': collectionId,
+      'content_id': contentId,
+      'sort_order': existing.length,
+    });
+  }
+
+  Future<void> removeContentFromCollection({
+    required String collectionId,
+    required String contentId,
+  }) async {
+    final db = await database;
+    await db.delete(
+      'collection_items',
+      where: 'collection_id = ? AND content_id = ?',
+      whereArgs: [collectionId, contentId],
+    );
+  }
+
+  Future<void> deleteCollection(String collectionId) async {
+    final db = await database;
+    await db.delete('collection_items',
+        where: 'collection_id = ?', whereArgs: [collectionId]);
+    await db.delete('collections', where: 'id = ?', whereArgs: [collectionId]);
+  }
+
+  // ── String settings (onboarding, role, notification toggles) ──
+
+  Future<String?> getString(String key) async {
+    final db = await database;
+    final rows = await db.query('string_kv_store',
+        where: 'key = ?', whereArgs: [key]);
+    if (rows.isEmpty) return null;
+    return rows.first['value'] as String;
+  }
+
+  Future<void> setString(String key, String value) async {
+    final db = await database;
+    await db.insert(
+      'string_kv_store',
+      {'key': key, 'value': value},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
