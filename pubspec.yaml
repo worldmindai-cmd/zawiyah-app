@@ -56,9 +56,22 @@ dev_dependencies:
     sdk: flutter
   flutter_driver:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
   generate: true # Enables flutter_localizations codegen from .arb files
   assets:
     - assets/content/kahani/
+
+# Real Zawiyah app icon (mihrab niche + lamp, gold on near-black --
+# matches ZawiyahColors), replacing the default Flutter placeholder
+# that was still shipping in android/ and ios/. Run `dart run
+# flutter_launcher_icons` after changing assets/icon/*.png.
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#050505"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  remove_alpha_ios: true

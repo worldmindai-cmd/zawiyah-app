@@ -42,5 +42,5 @@ flutter build appbundle --release
 - Apple age rating and Google content rating — answer key in `AGE_AND_CONTENT_RATINGS.md`, still needs to actually be entered in App Store Connect / Play Console (only fillable live in each console).
 - ~~Release signing credentials.~~ Generated — see Android section above.
 - Scholar/content reviewer approval for public religious content — see `CONTENT_REVIEW_PACKAGE.md`.
-- **App icon is still the default Flutter placeholder** on both Android (`android/app/src/main/res/mipmap-*/ic_launcher.png`) and iOS (`ios/Runner/Assets.xcassets/AppIcon.appiconset/`), despite `CHANGELOG.md` claiming "original Zawiyah app icon assets" were added — found while making the feature graphic. Needs a real designed icon before submission; both stores scrutinize (and can reject) apps shipping the stock Flutter logo.
+- ~~App icon.~~ Real icon added — a mihrab (prayer-niche) with a lamp, gold on near-black, matching `zawiyah_colors.dart` and avoiding any figurative depiction per the Constitution. Generated via `flutter_launcher_icons` from `assets/icon/icon.png` (full-bleed, iOS/legacy Android) and `assets/icon/icon_foreground.png` (Android adaptive icon layer). Re-run `dart run flutter_launcher_icons` after editing either source file.
 - ~~Feature graphic (Google Play, 1024×500).~~ `store_assets/feature_graphic.png`.
