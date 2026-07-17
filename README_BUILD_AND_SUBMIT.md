@@ -22,13 +22,12 @@ flutter test
 7. Complete App Privacy answers. Current v1 stores devotional progress and onboarding role locally and does not contain advertising.
 
 ## Android
-1. Create a Play upload key and `android/key.properties`.
-2. Replace the temporary debug release signing fallback in `android/app/build.gradle.kts` with the upload signing configuration before Play upload.
-3. Build:
+1. Release signing is configured — `android/app/build.gradle.kts` loads `android/key.properties` (gitignored, not committed) and signs with the `zawiyah-upload` key. Both `key.properties` and `android/app/upload-keystore.jks` exist only on the machine that generated them; back them up somewhere durable, since losing them blocks future Play updates.
+2. Build:
 ```bash
 flutter build appbundle --release
 ```
-4. Upload `build/app/outputs/bundle/release/app-release.aab` to Play Console.
+3. Upload `build/app/outputs/bundle/release/app-release.aab` to Play Console.
 
 ## Content review before release
 - Confirm all Arabic, transliteration and English translations.
@@ -37,9 +36,9 @@ flutter build appbundle --release
 - No visual depictions of the Prophet (SAW), Lady Fatima (SA), or the Twelve Imams (AS).
 
 ## Store-review blockers to complete
-- Hosted privacy policy URL.
-- Support/contact URL.
+- ~~Hosted privacy policy URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/privacy-policy.html
+- ~~Support/contact URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/support.html
 - Final screenshots for required device sizes.
 - Apple age rating and Google content rating.
-- Release signing credentials.
-- Scholar/content reviewer approval for public religious content.
+- ~~Release signing credentials.~~ Generated — see Android section above.
+- Scholar/content reviewer approval for public religious content — see `CONTENT_REVIEW_PACKAGE.md`.

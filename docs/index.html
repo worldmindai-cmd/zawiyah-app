@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zawiyah</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fdfaf3;
+    --text: #201a10;
+    --muted: #6b6152;
+    --card: #ffffff;
+    --border: #e7ddc8;
+    --gold: #a9781f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14110b;
+      --text: #f2ead9;
+      --muted: #b2a48a;
+      --card: #1d1810;
+      --border: #35291a;
+      --gold: #d8ab52;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    max-width: 480px;
+    padding: 24px;
+    text-align: center;
+  }
+  h1 {
+    color: var(--gold);
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  p.tagline {
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+  .links {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  a.link {
+    display: inline-block;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--card);
+  }
+  a.link:hover { border-color: var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Zawiyah</h1>
+  <p class="tagline">A companion for worship, remembrance and learning through the
+  Holy Qur'an and the Ahlul Bayt (AS).</p>
+  <div class="links">
+    <a class="link" href="privacy-policy.html">Privacy Policy</a>
+    <a class="link" href="support.html">Support</a>
+  </div>
+</main>
+</body>
+</html>
