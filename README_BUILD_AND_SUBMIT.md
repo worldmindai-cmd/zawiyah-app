@@ -39,6 +39,6 @@ flutter build appbundle --release
 - ~~Hosted privacy policy URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/privacy-policy.html
 - ~~Support/contact URL.~~ https://worldmindai-cmd.github.io/zawiyah-app/support.html
 - ~~Final screenshots for required device sizes.~~ `store_assets/screenshots/` — iPhone 17 Pro Max (6.9"), iPad Pro 13", Android phone (Pixel 8 Pro), 5 screens each (Home, Morning A'māl, Kahani, Library, More). Regenerate anytime with `integration_test/screenshot_flow_test.dart` via `flutter drive --driver=test_driver/integration_test.dart --target=integration_test/screenshot_flow_test.dart -d <device>`, capturing on each `SCREENSHOT_READY:<name>` stdout marker. Note: the iPad screenshots show the phone layout simply stretched to full width, not a tailored tablet layout — functional but not polished; worth a proper responsive pass before submission if that matters for the listing.
-- Apple age rating and Google content rating.
+- Apple age rating and Google content rating — answer key in `AGE_AND_CONTENT_RATINGS.md`, still needs to actually be entered in App Store Connect / Play Console (only fillable live in each console).
 - ~~Release signing credentials.~~ Generated — see Android section above.
 - Scholar/content reviewer approval for public religious content — see `CONTENT_REVIEW_PACKAGE.md`.
