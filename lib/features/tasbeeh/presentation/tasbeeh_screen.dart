@@ -75,10 +75,10 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: const Color(0xFF3D3320)),
           ),
-          child: Column(
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Action',
                 style: TextStyle(
                   color: ZawiyahColors.gold,
@@ -86,7 +86,7 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
                   fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                 'Use this for any additional dhikr outside the structured morning routine.',
                 style: ZawiyahTypography.translation,
@@ -104,7 +104,7 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Quick counter', style: ZawiyahTypography.label),
+              const Text('Quick counter', style: ZawiyahTypography.label),
               const SizedBox(height: 8),
               Text(
                 '$count',
@@ -119,12 +119,12 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: _tap,
-                    child: Text(l10n_of(context).tap),
+                    child: Text(AppLocalizations.of(context)!.tap),
                   ),
                   const SizedBox(width: 8),
                   TextButton(
                     onPressed: _reset,
-                    child: Text(l10n_of(context).reset),
+                    child: Text(AppLocalizations.of(context)!.reset),
                   ),
                 ],
               ),
@@ -140,7 +140,7 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
+              const Text(
                 'For any extra dhikr beyond the structured routine.',
                 style: ZawiyahTypography.subtitle,
               ),
@@ -151,7 +151,3 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen> {
     );
   }
 }
-
-// Small helper since AppLocalizations.of(context)! is used in a
-// couple of nested places above.
-AppLocalizations l10n_of(BuildContext context) => AppLocalizations.of(context)!;

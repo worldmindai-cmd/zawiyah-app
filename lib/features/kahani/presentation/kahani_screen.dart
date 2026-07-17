@@ -41,28 +41,67 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
   Future<void> _speak(KahaniItem item) async {
     final speakableText = item.speakableTextFor(_selectedLanguage!);
     if (speakableText == null || speakableText.isEmpty) return;
-    await _tts.stop();
-    await _tts.setLanguage(item.ttsLocaleFor(_selectedLanguage!));
-    await _tts.speak(speakableText);
+    try {
+      await _tts.stop();
+      final locale = item.ttsLocaleFor(_selectedLanguage!);
+      final setLangResult = await _tts.setLanguage(locale);
+      final speakResult = await _tts.speak(speakableText);
+      if (!mounted) return;
+      if (setLangResult != 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'setLanguage("$locale") returned $setLangResult — this locale may not be installed.',
+            ),
+          ),
+        );
+      } else if (speakResult != 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('speak() returned $speakResult (expected 1).')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('TTS error: $e')),
+      );
+    }
   }
 
   Future<void> _showAvailableLanguages() async {
-    final languages = await _tts.getLanguages;
+    String content;
+    try {
+      final languages = await _tts.getLanguages;
+      final voices = await _tts.getVoices;
+      final buffer = StringBuffer();
+      buffer.writeln('LANGUAGES (${(languages as List).length}):');
+      buffer.writeln(languages.join(', '));
+      buffer.writeln();
+      buffer.writeln('VOICES (${(voices as List).length}):');
+      for (final v in voices) {
+        buffer.writeln(v.toString());
+      }
+      content = buffer.toString();
+    } catch (e, stack) {
+      content = 'ERROR calling getLanguages/getVoices:\n$e\n\n$stack';
+    }
+
     if (!mounted) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ZawiyahColors.card,
         title: const Text(
-          'Installed TTS languages',
+          'TTS diagnostic',
           style: TextStyle(color: ZawiyahColors.gold),
         ),
         content: SizedBox(
           width: double.maxFinite,
+          height: 400,
           child: SingleChildScrollView(
-            child: Text(
-              (languages as List).join('\n'),
-              style: ZawiyahTypography.body,
+            child: SelectableText(
+              content,
+              style: ZawiyahTypography.body.copyWith(fontSize: 12),
             ),
           ),
         ),
@@ -125,10 +164,10 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFF3D3320)),
                 ),
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Action',
                       style: TextStyle(
                         color: ZawiyahColors.gold,
@@ -136,7 +175,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Text(
                       'Choose a kahani, select the language, then either read it yourself or use the phone voice to recite it aloud.',
                       style: ZawiyahTypography.translation,
@@ -155,7 +194,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Choose a kahani', style: ZawiyahTypography.label),
+                    const Text('Choose a kahani', style: ZawiyahTypography.label),
                     const SizedBox(height: 8),
                     DropdownButton<String>(
                       isExpanded: true,
@@ -174,7 +213,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                       onChanged: (id) => _onKahaniChanged(id, items),
                     ),
                     const SizedBox(height: 14),
-                    Text('Language', style: ZawiyahTypography.label),
+                    const Text('Language', style: ZawiyahTypography.label),
                     const SizedBox(height: 8),
                     DropdownButton<String>(
                       isExpanded: true,
@@ -208,7 +247,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Text(
+                    const Text(
                       'Uses the phone\'s voice engine where available: Siri-style voices on iPhone and Google voices on Android. Full Urdu/Arabic voice quality depends on installed device voices.',
                       style: ZawiyahTypography.subtitle,
                     ),
@@ -234,10 +273,10 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: ZawiyahColors.green.withOpacity(0.12),
+                            color: ZawiyahColors.green.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: ZawiyahColors.green.withOpacity(0.4),
+                              color: ZawiyahColors.green.withValues(alpha: 0.4),
                             ),
                           ),
                           child: const Text(
@@ -275,7 +314,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('A\'māl alongside this kahani',
+                      const Text('A\'māl alongside this kahani',
                           style: ZawiyahTypography.label),
                       const SizedBox(height: 8),
                       Text(item.aamal!, style: ZawiyahTypography.translation),

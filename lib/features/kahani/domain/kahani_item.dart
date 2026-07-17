@@ -14,6 +14,8 @@
 // this should never be silently presented as equally authoritative.
 // ============================================================
 
+import 'urdu_to_devanagari.dart';
+
 class KahaniItem {
   final String id;
   final String title;
@@ -42,12 +44,14 @@ class KahaniItem {
     'romanUrdu': 'Roman Urdu',
     'arabic': 'Arabic',
   };
-  // TTS locale to use for each language key -- Roman Urdu still reads
-  // with the Urdu voice, since it's the same language just transliterated.
+  // TTS locale to use for each language key. Urdu routes through
+  // Hindi (hi-IN) since Hindi voices are far more commonly installed
+  // than Urdu ones, and spoken Urdu/Hindi are the same language --
+  // see urdu_to_devanagari.dart for the transliteration this depends on.
   static const _ttsLocales = {
     'english': 'en-GB',
-    'urduScript': 'ur-PK',
-    'romanUrdu': 'ur-PK',
+    'urduScript': 'hi-IN',
+    'romanUrdu': 'hi-IN',
     'arabic': 'ar',
   };
 
@@ -63,17 +67,23 @@ class KahaniItem {
       aiTranslatedLanguages.contains(languageKey);
 
   /// The text that should actually be SPOKEN for a given selected
-  /// language -- distinct from what's DISPLAYED. TTS engines read
-  /// based on script, not phonetic intent: feeding Roman Urdu (Latin
-  /// letters) to an Urdu voice engine does not produce correct Urdu
-  /// pronunciation, since the voice expects actual Urdu script. So
-  /// when "Roman Urdu" is selected, we still display the Roman Urdu
-  /// text (for readers who prefer that script) but speak the real
-  /// Urdu-script version underneath, falling back to the Roman Urdu
-  /// text only if no Urdu-script version exists for this kahani yet.
+  /// language. Urdu (either script) is transliterated to Devanagari
+  /// and spoken via the Hindi voice (see ttsLocaleFor) -- see
+  /// urdu_to_devanagari.dart for why. Falls back to the raw Urdu-
+  /// script/Roman text if Devanagari conversion isn't applicable.
   String? speakableTextFor(String languageKey) {
-    if (languageKey == 'romanUrdu') {
-      return urduScript ?? romanUrdu;
+    if (languageKey == 'romanUrdu' && romanUrdu != null) {
+      return romanUrduToDevanagari(romanUrdu!);
+    }
+    if (languageKey == 'urduScript') {
+      // Prefer transliterating from Roman Urdu if we have it (more
+      // reliable input for this rule-based converter than parsing
+      // Urdu/Arabic script directly, which this converter doesn't
+      // handle at all yet). Fall back to displaying the raw script
+      // text if no Roman Urdu variant exists for this item.
+      return romanUrdu != null
+          ? romanUrduToDevanagari(romanUrdu!)
+          : urduScript;
     }
     return textFor(languageKey);
   }

@@ -87,3 +87,29 @@ class AmalSection {
     this.initiallyOpen = false,
   });
 }
+
+/// Flattens every textItem block (including those nested inside
+/// groups) across a list of sections, keyed by contentId. Used by
+/// Collections to look up and render a specific item by ID, since a
+/// collection only stores content IDs, never duplicating the content
+/// itself (per the Offline Content Architecture decision).
+Map<String, AmalBlock> flattenTextItemsById(List<AmalSection> sections) {
+  final result = <String, AmalBlock>{};
+  void visit(AmalBlock block) {
+    if (block.kind == AmalBlockKind.textItem && block.contentId != null) {
+      result[block.contentId!] = block;
+    }
+    if (block.kind == AmalBlockKind.group && block.children != null) {
+      for (final child in block.children!) {
+        visit(child);
+      }
+    }
+  }
+
+  for (final section in sections) {
+    for (final block in section.blocks) {
+      visit(block);
+    }
+  }
+  return result;
+}

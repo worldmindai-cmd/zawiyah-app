@@ -1,4 +1,14 @@
-import 'package:flutter/material.dart';
+// ============================================================
+// Zawiyah — Shia Calendar (ChatGPT-built, adopted after review)
+// lib/core/calendar/zawiyah_calendar.dart
+//
+// Adopted from ChatGPT's version over Claude's own draft: better
+// sourced event data (Ashura, Arbaeen, Bibi Sakina's anniversary with
+// the Hyderabad note, Wiladat/Shahadat dates, Eid dates) and a more
+// standard Kuwaiti-algorithm formula. Manual dayOffset support (added
+// by Claude) layers on top since real moon-sighting varies by
+// region/marja' and can differ from this tabular calculation.
+// ============================================================
 
 class HijriDateValue {
   final int year;
@@ -34,7 +44,11 @@ class ShiaCalendarContext {
 class ZawiyahCalendar {
   ZawiyahCalendar._();
 
-  static ShiaCalendarContext now() => forDate(DateTime.now());
+  /// [dayOffset] applies a manual adjustment on top of the calculated
+  /// date -- since real moon-sighting varies by region/marja' and can
+  /// differ from this tabular calculation, users can nudge it by a day.
+  static ShiaCalendarContext now({int dayOffset = 0}) =>
+      forDate(DateTime.now().add(Duration(days: dayOffset)));
 
   /// Tabular Hijri conversion used only for contextual display in v1.
   /// A future release should support a user-adjustable local moon-sighting

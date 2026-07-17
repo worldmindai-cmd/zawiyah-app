@@ -53,7 +53,7 @@ class AmalBlockView extends ConsumerWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('•  ', style: ZawiyahTypography.translation),
+                          const Text('•  ', style: ZawiyahTypography.translation),
                           Expanded(
                             child: Text(item,
                                 style: ZawiyahTypography.translation),

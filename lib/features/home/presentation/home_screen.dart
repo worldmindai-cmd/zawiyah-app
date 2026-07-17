@@ -1,16 +1,41 @@
+// ============================================================
+// Zawiyah — Home Screen
+// lib/features/home/presentation/home_screen.dart
+//
+// Shows Gregorian + Hijri date (calculated/estimated, with manual
+// +/-1 day adjustment) plus the actual regional event for the day
+// (Ashura, Arbaeen, Bibi Sakina's anniversary, etc. -- via
+// ZawiyahCalendar, adopted from ChatGPT's build after review), plus
+// quick access to every main feature.
+// ============================================================
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/calendar/calendar_provider.dart';
 import '../../../core/calendar/zawiyah_calendar.dart';
 import '../../../core/design_system/zawiyah_colors.dart';
 import '../../../core/design_system/zawiyah_typography.dart';
-import '../../../shared/navigation/root_shell.dart';
+import '../../../core/storage/local_storage_service.dart';
+import '../../morning_aamal/presentation/morning_aamal_screen.dart';
+import '../../tasbeeh/presentation/tasbeeh_screen.dart';
+import '../../kahani/presentation/kahani_screen.dart';
+import '../../library/presentation/library_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  Future<void> _adjustHijriOffset(WidgetRef ref, int delta) async {
+    final current = await LocalStorageService().getHijriDayOffset();
+    await LocalStorageService().setHijriDayOffset(current + delta);
+    ref.invalidate(hijriDayOffsetProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = ZawiyahCalendar.now();
+    final ctx = ref.watch(currentCalendarContextProvider);
+    final gregorianLabel = ZawiyahCalendar.gregorianLabel(ctx.deviceDateTime);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Zawiyah')),
       body: ListView(
@@ -18,53 +43,156 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: ZawiyahColors.card2, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZawiyahColors.divider2)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(ZawiyahCalendar.gregorianLabel(c.deviceDateTime), style: ZawiyahTypography.label),
-              const SizedBox(height: 6),
-              Text(c.hijri.formatted, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: ZawiyahColors.gold)),
-              const SizedBox(height: 10),
-              Text(c.eventText, style: ZawiyahTypography.translation),
-              if (c.isMourning) ...[
+            decoration: BoxDecoration(
+              color: ZawiyahColors.card,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: ZawiyahColors.divider),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(gregorianLabel, style: ZawiyahTypography.body),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        ctx.hijri.formatted,
+                        style: ZawiyahTypography.heading.copyWith(fontSize: 18),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline,
+                          size: 20, color: ZawiyahColors.muted),
+                      onPressed: () => _adjustHijriOffset(ref, -1),
+                      tooltip: 'Adjust one day earlier',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline,
+                          size: 20, color: ZawiyahColors.muted),
+                      onPressed: () => _adjustHijriOffset(ref, 1),
+                      tooltip: 'Adjust one day later',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Calculated date — may differ from local moon-sighting or your community\'s observance. Adjust above if needed.',
+                  style: ZawiyahTypography.subtitle,
+                ),
                 const SizedBox(height: 10),
-                const Text('Mourning theme active', style: TextStyle(color: ZawiyahColors.red, fontWeight: FontWeight.w700)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: ctx.isMourning
+                        ? ZawiyahColors.mourningLabel.withValues(alpha: 0.12)
+                        : ZawiyahColors.card2,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    ctx.eventText,
+                    style: ZawiyahTypography.subtitle.copyWith(
+                      color: ctx.isMourning
+                          ? ZawiyahColors.mourningLabel
+                          : ZawiyahColors.muted,
+                    ),
+                  ),
+                ),
               ],
-            ]),
+            ),
           ),
-          const SizedBox(height: 14),
-          _card(
-            title: 'Suggested Morning A‘māl',
-            body: 'A personal routine shared by a member of the Zawiyah development team in the hope that others may benefit. It is an example collection, not a prescribed or comprehensive routine.',
-            action: 'Begin',
-            onTap: () => ref.read(rootShellTabIndexProvider.notifier).state = 1,
+          const SizedBox(height: 16),
+          const Text('Quick access', style: ZawiyahTypography.label),
+          const SizedBox(height: 10),
+          _QuickAccessCard(
+            icon: Icons.wb_twilight_outlined,
+            title: 'Morning A\'māl',
+            subtitle: 'Continue today\'s routine',
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const MorningAamalScreen())),
           ),
-          _card(
-            title: 'Digital Tasbeeh',
-            body: 'Use haptic counters with a full-screen tap mode when you do not want to look at the phone.',
-            action: 'Open',
-            onTap: () => ref.read(rootShellTabIndexProvider.notifier).state = 2,
+          _QuickAccessCard(
+            icon: Icons.filter_9_plus_outlined,
+            title: 'Tasbeeh',
+            subtitle: 'Quick dhikr counter',
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const TasbeehScreen())),
           ),
-          _card(
-            title: 'Devotional Kahani',
-            body: 'Read or listen using the phone voice. Content provenance remains visible.',
-            action: 'Open',
-            onTap: () => ref.read(rootShellTabIndexProvider.notifier).state = 3,
+          _QuickAccessCard(
+            icon: Icons.auto_stories_outlined,
+            title: 'Kahani',
+            subtitle: 'Stories with meaning',
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const KahaniScreen())),
+          ),
+          _QuickAccessCard(
+            icon: Icons.local_library_outlined,
+            title: 'Library',
+            subtitle: 'Qur\'an, du\'as, Ask the Sources, and more',
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const LibraryScreen())),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _card({required String title, required String body, required String action, required VoidCallback onTap}) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(color: ZawiyahColors.gold, fontWeight: FontWeight.w800, fontSize: 17)),
-        const SizedBox(height: 8),
-        Text(body, style: ZawiyahTypography.translation),
-        const SizedBox(height: 12),
-        Align(alignment: AlignmentDirectional.centerEnd, child: FilledButton(onPressed: onTap, child: Text(action))),
-      ]),
-    ),
-  );
+class _QuickAccessCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _QuickAccessCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: ZawiyahColors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: ZawiyahColors.divider),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: ZawiyahColors.card2,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: ZawiyahColors.gold, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          color: ZawiyahColors.text,
+                          fontWeight: FontWeight.w600)),
+                  Text(subtitle, style: ZawiyahTypography.subtitle),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right,
+                color: ZawiyahColors.muted, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
 }

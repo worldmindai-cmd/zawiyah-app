@@ -112,11 +112,23 @@ abstract class AppLocalizations {
   /// **'A place of learning, worship and companionship through the Holy Qur\'an and the teachings of the Ahlul Bayt (AS)'**
   String get appSubtitle;
 
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
   /// No description provided for @navMorningAamal.
   ///
   /// In en, this message translates to:
   /// **'Morning A\'māl'**
   String get navMorningAamal;
+
+  /// No description provided for @navLearn.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get navLearn;
 
   /// No description provided for @navTasbeeh.
   ///
@@ -129,6 +141,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Kahani'**
   String get navKahani;
+
+  /// No description provided for @navLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get navLibrary;
 
   /// No description provided for @navMore.
   ///

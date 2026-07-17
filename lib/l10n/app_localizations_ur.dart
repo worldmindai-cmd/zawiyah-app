@@ -16,13 +16,22 @@ class AppLocalizationsUr extends AppLocalizations {
       'قرآن کریم اور اہل بیت علیہم السلام کی تعلیمات کے ذریعے سیکھنے، عبادت اور رفاقت کی جگہ';
 
   @override
+  String get navHome => 'ہوم';
+
+  @override
   String get navMorningAamal => 'صبح کے اعمال';
+
+  @override
+  String get navLearn => 'سیکھیں';
 
   @override
   String get navTasbeeh => 'تسبیح';
 
   @override
   String get navKahani => 'کہانی';
+
+  @override
+  String get navLibrary => 'لائبریری';
 
   @override
   String get navMore => 'مزید / مدد';
