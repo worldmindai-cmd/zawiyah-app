@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/calendar/calendar_provider.dart';
 import 'core/design_system/zawiyah_theme.dart';
+import 'core/locale/locale_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/navigation/app_gate.dart';
 
@@ -26,11 +27,13 @@ class ZawiyahApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ctx = ref.watch(currentCalendarContextProvider);
     final theme = ctx.isMourning ? ZawiyahTheme.mourning : ZawiyahTheme.normal;
+    final locale = ref.watch(appLocaleProvider).value;
 
     return MaterialApp(
       title: 'Zawiyah',
       debugShowCheckedModeBanner: false,
       theme: theme,
+      locale: locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

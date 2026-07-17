@@ -53,7 +53,7 @@ class RootShell extends ConsumerWidget {
           ),
           NavigationDestination(
             icon: const Icon(Icons.auto_stories_outlined),
-            label: l10n.navLearn,
+            label: l10n.navKahani,
           ),
           NavigationDestination(
             icon: const Icon(Icons.local_library_outlined),

@@ -88,6 +88,19 @@ class KahaniItem {
     return textFor(languageKey);
   }
 
+  /// The locale to pair with [speakableTextFor]'s returned text --
+  /// deliberately mirrors that method's branching rather than using
+  /// [ttsLocaleFor] directly, since the two can disagree: transliterated
+  /// Devanagari text needs the Hindi voice, but the raw Urdu-script
+  /// fallback (used when no Roman Urdu variant exists) is Perso-Arabic
+  /// script that hi-IN cannot parse and needs a genuine Urdu voice.
+  String speakableLocaleFor(String languageKey) {
+    if (languageKey == 'urduScript' && romanUrdu == null) {
+      return 'ur-PK';
+    }
+    return ttsLocaleFor(languageKey);
+  }
+
   String? textFor(String languageKey) {
     switch (languageKey) {
       case 'english':

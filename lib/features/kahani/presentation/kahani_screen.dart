@@ -43,7 +43,7 @@ class _KahaniScreenState extends ConsumerState<KahaniScreen> {
     if (speakableText == null || speakableText.isEmpty) return;
     try {
       await _tts.stop();
-      final locale = item.ttsLocaleFor(_selectedLanguage!);
+      final locale = item.speakableLocaleFor(_selectedLanguage!);
       final setLangResult = await _tts.setLanguage(locale);
       final speakResult = await _tts.speak(speakableText);
       if (!mounted) return;

@@ -7,9 +7,16 @@
 // flutter_secure_storage -- an onboarding-complete flag and a role
 // preference aren't sensitive enough to warrant a second persistence
 // system running alongside the one everything else already uses.
+//
+// MIGRATION: earlier builds stored these in flutter_secure_storage
+// under 'zawiyah_onboarded'/'zawiyah_role'. On first launch of this
+// build, fall back to those keys so existing testers don't get
+// dropped back into onboarding and lose their role choice -- then
+// migrate the values into LocalStorageService and clear the old keys.
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../core/storage/local_storage_service.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
@@ -22,6 +29,7 @@ class AppGate extends StatefulWidget {
 }
 
 class _AppGateState extends State<AppGate> {
+  static const _legacyStorage = FlutterSecureStorage();
   late Future<bool> _ready;
 
   @override
@@ -30,8 +38,25 @@ class _AppGateState extends State<AppGate> {
     _ready = _isOnboarded();
   }
 
-  Future<bool> _isOnboarded() async =>
-      (await LocalStorageService().getString('onboarding_complete')) == '1';
+  Future<bool> _isOnboarded() async {
+    if ((await LocalStorageService().getString('onboarding_complete')) == '1') {
+      return true;
+    }
+    return _migrateFromLegacyStorage();
+  }
+
+  Future<bool> _migrateFromLegacyStorage() async {
+    final legacyOnboarded = await _legacyStorage.read(key: 'zawiyah_onboarded');
+    if (legacyOnboarded != 'true') return false;
+
+    final legacyRole = await _legacyStorage.read(key: 'zawiyah_role');
+    final storage = LocalStorageService();
+    await storage.setString('user_role', legacyRole ?? 'adult');
+    await storage.setString('onboarding_complete', '1');
+    await _legacyStorage.delete(key: 'zawiyah_onboarded');
+    await _legacyStorage.delete(key: 'zawiyah_role');
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) => FutureBuilder<bool>(

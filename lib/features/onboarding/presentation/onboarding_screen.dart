@@ -13,21 +13,23 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design_system/zawiyah_colors.dart';
 import '../../../core/design_system/zawiyah_typography.dart';
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../domain/user_role.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   final VoidCallback onComplete;
   const OnboardingScreen({super.key, required this.onComplete});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _page = 0;
   UserRole? _role;
   String _language = 'en';
@@ -43,6 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await storage.setString('user_role', (_role ?? UserRole.adult).storageKey);
     await storage.setString('app_language', _language);
     await storage.setString('onboarding_complete', '1');
+    ref.invalidate(appLocaleProvider);
     widget.onComplete();
   }
 
