@@ -56,8 +56,7 @@ Even for closed testing, Play Console wants a basic store listing
 - Screenshots: `store_assets/screenshots/android-phone/` (already
   device-correct size for a phone listing)
 - App icon: already in `android/app/src/main/res/mipmap-*/ic_launcher.png`
-- Feature graphic (1024×500): not yet created — you'll need one before
-  this section is marked complete; not something I've built yet
+- Feature graphic (1024×500): `store_assets/feature_graphic.png` — typography-led (no logo mark, since there isn't a real one yet — see note below), using the app's actual color palette from `zawiyah_colors.dart`
 
 ## 4. Set up the closed testing track
 
